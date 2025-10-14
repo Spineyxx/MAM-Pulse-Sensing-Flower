@@ -1,9 +1,16 @@
 #include "detectPeaks.h"
+#include <Arduino.h>
+#include "peakDetectorState.h"
+
+void peakTest()
+{
+  Serial.println("Peak detected!");
+}
 
 void detectPeaks(PeakDetectorState *detector)
 {
   static uint32_t potentialPeak = 0;
-  static unsigned long hrInterval = 0;
+  // static unsigned long hrInterval = 0;
   static char derivPrev = 'r'; // r = rising; f = falling
   static int irSmooth_prev = 0;
   static int trigger = 0;
@@ -11,6 +18,8 @@ void detectPeaks(PeakDetectorState *detector)
   static int triggerOld = 0;
   static boolean triggeredOld = false;
   static uint32_t thePeakBefore = 0;
+  static int hrInterval[5] = {0};
+  static int hrIntervalIndex = 0;
 
   // Average of last 5 samples (irSmooth) and last 50 samples (irBaseline):
   long sumSmooth = 0;
@@ -30,7 +39,7 @@ void detectPeaks(PeakDetectorState *detector)
   long irBaseline = sumBaseline / 50; //=average of last 50 values
   // note: calculation errors until the array is filled with respective amount of values
 
-  if (irBaseline > 10000)
+  if (irSmooth > 90000)
   { // FINGER ON = TRUE --> start Peak Detection
     if (detector->detectionState == 0)
     {
@@ -53,21 +62,46 @@ void detectPeaks(PeakDetectorState *detector)
 
       switch (detector->detectionState)
       {
-      case 1: // finger just placed onto the sensor, first 3 peaks are accepted
+      case 1: // finger just placed onto the sensor, first 4 peaks are accepted
       case 2:
       case 3:
+      case 4:
         thePeakBefore = detector->lastPeak;
         detector->lastPeak = potentialPeak;
-        hrInterval = 200;
         detector->detectionState++;
         break;
-      case 4: // from now on check interval
+      case 5: // average interval of next 5 peaks is calculated
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+        thePeakBefore = detector->lastPeak;
+        detector->lastPeak = potentialPeak;
+        hrIntervalIndex = detector->detectionState - 5;
+        hrInterval[hrIntervalIndex] = detector->lastPeak - thePeakBefore;
+        detector->detectionState++;
+        break;
+      case 10: // ONLY AT 10 PEAK DETECTION IS VALID
         unsigned long diff = potentialPeak - detector->lastPeak;
-        if (diff > hrInterval * 0.6)
-        {
+        int hrIntervalSum = 0;
+        for (int i = 0; i <= 4; i++)
+        { // build sum of last 5 intervals
+          hrIntervalSum += hrInterval[i];
+        }
+        if (diff > ((hrIntervalSum / 5) * 0.8))
+        { // peak accepted
           thePeakBefore = detector->lastPeak;
           detector->lastPeak = potentialPeak;
-          hrInterval = diff;
+          if (hrIntervalIndex < 4)
+          {
+            hrIntervalIndex++;
+          }
+          else
+          {
+            hrIntervalIndex = 0;
+          }
+          hrInterval[hrIntervalIndex] = diff;
+          // peakTest();
 
           if (triggered)
           {
@@ -80,7 +114,6 @@ void detectPeaks(PeakDetectorState *detector)
             triggered = true;
           }
         }
-        break;
       }
 
       if (triggeredOld)
@@ -100,7 +133,8 @@ void detectPeaks(PeakDetectorState *detector)
     detector->detectionState = 0;
   }
 
-  plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger, (int)detector->detectionState);
+  // plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger, (int)detector->detectionState);
+  plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
 
   // save signal values for next iteration
   irSmooth_prev = irSmooth;
@@ -111,14 +145,14 @@ void detectPeaks(PeakDetectorState *detector)
 };
 
 // Serial Plotter - HR Peak Detection
-void plot(int amplitude, int irSmooth, int trigger, int detectionState)
+void plot(int amplitude, int irSmooth, int value)
 {
   Serial.print(amplitude);
   Serial.print("\t");
   Serial.print(irSmooth);
   Serial.print("\t");
-  Serial.print(detectionState);
-  Serial.print("\t");
-  Serial.print(trigger);
+  // Serial.print(trigger);
+  // Serial.print("\t");
+  Serial.print(value);
   Serial.print("\n");
 }

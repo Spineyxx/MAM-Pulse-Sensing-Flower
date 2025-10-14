@@ -3,7 +3,8 @@
 #include <Arduino.h>
 #include "peakDetectorState.h"
 
+void peakTest();
 void detectPeaks(PeakDetectorState *detector);
-void plot(int val1, int val2, int val3, int val4);
+void plot(int val1, int val2, int val3);
 
 #endif
