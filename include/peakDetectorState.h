@@ -2,11 +2,11 @@
 #define PEAKDETECTORSTATE_H
 #include <Arduino.h>
 
-typedef struct {
+typedef struct
+{
     int signalBuffer[50];
     int bufferIndex;
-    int lastPeak;
-    int thePeakBefore;
+    uint32_t lastPeak;
     char signalState;
     int detectionState;
 } PeakDetectorState;
