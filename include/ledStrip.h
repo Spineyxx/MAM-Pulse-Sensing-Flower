@@ -1,7 +1,8 @@
 #ifndef LEDSTRIP_H
 #define LEDSTRIP_H
-#include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
+#include <Arduino.h>
+
 #include "peakDetectorState.h"
 
 #define LED_BUILTIN 2
