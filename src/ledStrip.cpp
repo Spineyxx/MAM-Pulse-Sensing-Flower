@@ -1,3 +1,4 @@
+// Notizen:
 // detectionState auf 1 => schwaches Licht
 // Signal zum testen erstellen dass langsam von 0-4  durchtestet
 // geschwindigkeit des Lichtpuls => relativ, richtig schnell, doppelt gleichzeitig
@@ -55,4 +56,23 @@ void controlLEDs(PeakDetectorState *detector) {
   if (detector -> detectionState >= 4) { // After the 4th peak this starts
       activateLEDsOnce(0);
   }
+}
+
+void testStripSetup(){
+  strip.begin();
+  for (int i = 0; i < LED_COUNT; i++){
+    strip.setPixelColor(i, 0, 0, 0);
+  }
+  strip.show();
+}
+
+void testStripLoop(PeakDetectorState *detector){
+  detector -> detectionState = 4; //                                              
+  static uint32_t ts = 0;      //                                                   
+  if (millis() - ts > 1000)
+  { //                                                 
+    ts = millis();
+    activateLEDsOnce(1); // resettet pos
+  }
+  controlLEDs(detector); // Function for controlling the LED Strip
 }
