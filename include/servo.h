@@ -5,5 +5,6 @@
 
 void setupServo();
 void testServo();
+void testServoPeak();
 
 #endif
