@@ -4,6 +4,7 @@
 #include "ledStrip.h"
 #include "peakDetectorState.h"
 #include "readSensor.h"
+#include "servo.h"
 
 PeakDetectorState detector = {.signalBuffer = {0},
                               .bufferIndex = 0,
@@ -15,16 +16,18 @@ PeakDetectorState detector = {.signalBuffer = {0},
 // the setup function is called once (when the program starts)
 void setup() {
     Serial.begin(115200);
-    testStripSetup(); // zum Testen der LEDs nötig ~LINDA
+    //testStripSetup(); // zum Testen der LEDs nötig ~LINDA
     //setupSensor();  // zum Testen des Sensors nötig ~ANNA
+    setupServo();
 }
 
 // after the setup() function returned, the loop function is called in an endless loop
 void loop() {
     //getPulseOxySignal(&detector);  // zum Testen des Sensors nötig ~ANNA
-    int peak = detectPeaks(&detector);
-    Serial.println(peak);
-    testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
+    //int peak = detectPeaks(&detector);
+    //Serial.println(peak);
+    //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
+    testServo();
 }
 
 // NOTES ON DATA TYPES:
@@ -49,4 +52,5 @@ void loop() {
 // wurde, weil dann ist detectPeaks(&detector) = 1 und activateLEDsOnce(1);
 // --> LEDs leuchten auf
 //@ANNA: Du bisch so cool
+//@LINDA: ;)) du oh mit dina dialekt impressions
 //=========================================================================

@@ -4,6 +4,12 @@
 
 MAX30105 particleSensor;
 
+//SENSOR CONNECTION
+// VIN to 3.3V
+// GND to GND
+// SCL to ESP32 SCL (GPIO22)
+// SDA to ESP32 SDA (GPIO21)
+
 void setupSensor() {
     // Initialize sensor
     if (!particleSensor.begin(
