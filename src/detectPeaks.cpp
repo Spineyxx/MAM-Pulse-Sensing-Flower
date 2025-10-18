@@ -1,33 +1,32 @@
 #include "detectPeaks.h"
-
 #include <Arduino.h>
-
 #include "peakDetectorState.h"
 
-void peakTest() { Serial.println("Peak detected!"); }
+// ADAPT THE THRESHOLD FOR FINGER PLACEMENT DETECTION HERE
+// In different situations, the amount of received IR light varies greatly
+// -> higher threshold leads to higher sensitivity regarding finger placement
+// -> too high threshold might lead to no detection at all though
+#define FINGER_ON_THRESHOLD 40000
+
+//void peakTest() { Serial.println("Peak detected!"); }
 
 uint8_t detectPeaks(PeakDetectorState *detector) {
-    static uint32_t potentialPeak = 0;
-    // static unsigned long hrInterval = 0;
+    uint32_t potentialPeak = 0;
     static char derivPrev = 'r';  // r = rising; f = falling
     static uint16_t irSmooth_prev = 0;
+    uint8_t peakDetected = 0;
+    // Variables for Serial Plotter visualization:
     static uint16_t trigger = 0;
     static bool triggered = false;
     static int16_t triggerOld = 0;
     static bool triggeredOld = false;
-    static uint32_t thePeakBefore = 0;
-    static uint16_t hrInterval[5] = {0};
-    static uint8_t hrIntervalIndex = 0;
-    uint8_t peakDetected = 0;
 
-    // Average of last 5 samples (irSmooth) and last 50 samples (irBaseline):
+    // Calculating the average of last 5 samples (irSmooth) and last 50 samples (irBaseline):
     uint32_t sumSmooth = 0;
     uint32_t sumBaseline = 0;
 
-    for (uint8_t i = 0; i < 5;
-         i++) {  // take last 5 of the array that holds last 50
-        uint8_t index = ((detector->bufferIndex - i + 50) %
-                         50);  // to not go beyond bounds of array
+    for (uint8_t i = 0; i < 5; i++) {  // take last 5 of the array that holds last 50
+        uint8_t index = ((detector->bufferIndex - i + 50) % 50);  // to not go beyond bounds of array
         sumSmooth += detector->signalBuffer[index];
     }
     uint32_t irSmooth = sumSmooth / 5;  //=average of last 5 values
@@ -36,68 +35,72 @@ uint8_t detectPeaks(PeakDetectorState *detector) {
         sumBaseline += detector->signalBuffer[i];
     }
     uint32_t irBaseline = sumBaseline / 50;  //=average of last 50 values
-    // note: calculation errors until the array is filled with respective amount
-    // of values
+    
+    // NOTE: The creators of this code are aware that there will be initial
+    // errors in the baseline and smoothing calculation, until the arrays are filled
+    // up. However, we do not see them as critical, since this startup phase is so
+    // short that it does not affect peak detection in a relevant way
 
-    if (irSmooth > 90000) {  // FINGER ON = TRUE --> start Peak Detection
+    if (irSmooth > FINGER_ON_THRESHOLD) {  // FINGER ON = TRUE --> start Peak Detection
         if (detector->detectionState == 0) {
-            detector->detectionState++;
+            detector->detectionState++; 
+            //detectionState is always > 0 as soon as finger is placed on sensor
         }
 
-        // CURRENT PEAK DETECTION
-        if (irSmooth >= irSmooth_prev) {
-            // if current value is higher than the previous
+        if (irSmooth >= irSmooth_prev) { // if current value is higher than the previous
             detector->signalState = 'r';  // signal is rising
         } else {
             detector->signalState = 'f';  // else it is falling
         }
 
-        if (derivPrev == 'r' && detector->signalState == 'f') {
-            // if it used to rise, but now falls
+        if (derivPrev == 'r' && detector->signalState == 'f') { // if it used to rise, but now falls
             potentialPeak = millis();  // get timestamp of potential peak
 
+
             switch (detector->detectionState) {
-                case 1:  // finger just placed onto the sensor, first 4 peaks
-                         // are accepted
+                case 1:
                 case 2:
                 case 3:
                 case 4:
-                    thePeakBefore = detector->lastPeak;
+                    // first 4 peaks are accepted
+                    detector->peakBeforeLast = detector->lastPeak;
                     detector->lastPeak = potentialPeak;
                     detector->detectionState++;
                     break;
-                case 5:  // average interval of next 5 peaks is calculated
+                case 5:
                 case 6:
                 case 7:
                 case 8:
                 case 9:
-                    thePeakBefore = detector->lastPeak;
+                    // next 5 peaks are also accepted
+                    // + average interval of these 5 peaks is calculated
+                    detector->peakBeforeLast = detector->lastPeak;
                     detector->lastPeak = potentialPeak;
-                    hrIntervalIndex = detector->detectionState - 5;
-                    hrInterval[hrIntervalIndex] =
-                        detector->lastPeak - thePeakBefore;
+                    detector->hrIntervalIndex = detector->detectionState - 5;
+                    detector->hrInterval[detector->hrIntervalIndex] =
+                        detector->lastPeak - detector->peakBeforeLast;
                     detector->detectionState++;
                     break;
-                case 10:  // ONLY AT 10 PEAK DETECTION IS VALID
+                case 10:  // ONLY AT DETECTOR STATE 10 -> PEAK DETECTION IS VALID
                     uint32_t diff = potentialPeak - detector->lastPeak;
                     uint32_t hrIntervalSum = 0;
-                    for (uint8_t i = 0; i <= 4;
-                         i++) {  // build sum of last 5 intervals
-                        hrIntervalSum += hrInterval[i];
+                    for (uint8_t i = 0; i <= 4; i++) {  // build sum of last 5 intervals
+                        hrIntervalSum += detector->hrInterval[i];
                     }
-                    if (diff > ((hrIntervalSum / 5) * 0.8)) {  // peak accepted
-                        thePeakBefore = detector->lastPeak;
+                    if (diff > ((hrIntervalSum / 5) * 0.8)) {
+                        //the peak is valid when the interval is > 80% of the average of the last 5 intervals
+                        detector->peakBeforeLast = detector->lastPeak;
                         detector->lastPeak = potentialPeak;
-                        if (hrIntervalIndex < 4) {
-                            hrIntervalIndex++;
+                        if (detector->hrIntervalIndex < 4) { // move index forward
+                            detector->hrIntervalIndex++;
                         } else {
-                            hrIntervalIndex = 0;
+                            detector->hrIntervalIndex = 0;
                         }
-                        hrInterval[hrIntervalIndex] = diff;
-                        peakDetected = 1;
+                        detector->hrInterval[detector->hrIntervalIndex] = diff; //save the new interval
+                        peakDetected = 1; // set return variable to 1 to indicate peak detection
                         // peakTest();
 
-                        if (triggered) {
+                        if (triggered) { //this is just for visualization in the serial plotter
                             trigger = irBaseline - 200;
                             triggered = false;
                         } else {
@@ -107,7 +110,7 @@ uint8_t detectPeaks(PeakDetectorState *detector) {
                     }
             }
 
-            if (triggeredOld) {
+            if (triggeredOld) { //for visualisation of the previous peak in the serial plotter
                 triggerOld = irBaseline - 200;
                 triggeredOld = false;
             } else {
@@ -116,12 +119,11 @@ uint8_t detectPeaks(PeakDetectorState *detector) {
             }
         }
     } else {
-        detector->detectionState = 0;
+        detector->detectionState = 0; // FINGER ON = FALSE --> reset detection state to 0
     }
 
-    // plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger,
-    // (int)detector->detectionState);
-    // plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
+    // Uncomment the line below to visualize signal, smoothed signal and trigger in Serial Plotter
+    //plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
 
     // save signal values for next iteration
     irSmooth_prev = irSmooth;
@@ -129,17 +131,15 @@ uint8_t detectPeaks(PeakDetectorState *detector) {
 
     // move index to next position
     detector->bufferIndex = (detector->bufferIndex + 1) % 50;
-    return peakDetected;
+    return peakDetected; //returns 0, unless peak was detected -> 1
 }
 
-// Serial Plotter - HR Peak Detection
-void plot(int amplitude, int irSmooth, int value) {
-    Serial.print(amplitude);
+// Serial Plotter - HR Peak Detection - plot 3 signals
+void plot(int val1, int val2, int val3) {
+    Serial.print(val1);
     Serial.print("\t");
-    Serial.print(irSmooth);
+    Serial.print(val2);
     Serial.print("\t");
-    // Serial.print(trigger);
-    // Serial.print("\t");
-    Serial.print(value);
+    Serial.print(val3);
     Serial.print("\n");
 }
