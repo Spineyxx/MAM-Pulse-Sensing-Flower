@@ -8,7 +8,7 @@ Servo myServo;
 
 void setupServo(){
   myServo.setPeriodHertz(50);        // 50 Hz for servos
-  myServo.attach(SERVO_PIN, 500, 2400);     // Pin 18, min/max pulse width
+  myServo.attach(SERVO_PIN, 500, 2500);     // Pin 18, min/max pulse width
   pinMode(LED,OUTPUT);
 }
 
@@ -22,7 +22,8 @@ void testServo(){
       if (millis()-servoTimestamp > 50) {  // change servo position every 50 ms
         servoTimestamp = millis();
         myServo.write(90 + 90 * cos(2 * PI * servoCounter / 200.0));  // Move servo between 0 and 180 degrees and back
-        servoCounter++;
+        //myServo.write(0);
+        servoCounter++; //0 bis 200
         if (servoCounter > 200) {  // whole cycle takes 10 seconds
           servoCounter = 0;
         }

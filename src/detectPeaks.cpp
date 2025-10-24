@@ -39,7 +39,7 @@ uint8_t detectPeaks(PeakDetectorState *detector) {
     // note: calculation errors until the array is filled with respective amount
     // of values
 
-    if (irSmooth > 90000) {  // FINGER ON = TRUE --> start Peak Detection
+    if (irSmooth > 40000) {  // FINGER ON = TRUE --> start Peak Detection
         if (detector->detectionState == 0) {
             detector->detectionState++;
         }
