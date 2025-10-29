@@ -14,26 +14,24 @@ PeakDetectorState detector = {.signalBuffer = {0},
                               .detectionState = 0};
 
 FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
-                            .isOpen = false};
+                            .motion = 0}; //0 = closed, 1 = opening, 2 = open, 3 = closing
                             
 // the setup function is called once (when the program starts)
 void setup() {
     Serial.begin(115200);
     //testStripSetup(); // zum Testen der LEDs nötig ~LINDA
-    setupSensor();  // zum Testen des Sensors nötig ~ANNA
+    setupSensor();
     setupServo();
 }
 
 // after the setup() function returned, the loop function is called in an endless loop
 void loop() {
-    //getPulseOxySignal(&detector);  // zum Testen des Sensors nötig ~ANNA
-    //int peak = detectPeaks(&detector);
-    //Serial.println(detector.detectionState);
+    getPulseOxySignal(&detector);
+    uint8_t peak = detectPeaks(&detector); //returns 1 if a peak is detected, else 0
+
     //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
-    
-    //if(detector.detectionState == 10){
-    //   testServo();
-    //}
+
+    handleFlower(&flower, peak);
 
 }
 

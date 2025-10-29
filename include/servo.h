@@ -9,7 +9,7 @@ void setupServo();
 void testServo();
 void testServoPeak();
 void setSafeAngle(uint8_t angle);
-void toggleFlower(FlowerState *flower);
+void handleFlower(FlowerState *flower, uint8_t peak);
 
 
 #endif
