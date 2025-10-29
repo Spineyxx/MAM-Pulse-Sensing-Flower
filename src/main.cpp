@@ -23,13 +23,16 @@ void setup() {
 
 // after the setup() function returned, the loop function is called in an endless loop
 void loop() {
-    getPulseOxySignal(&detector);  // zum Testen des Sensors nötig ~ANNA
-    int peak = detectPeaks(&detector);
+    //getPulseOxySignal(&detector);  // zum Testen des Sensors nötig ~ANNA
+    //int peak = detectPeaks(&detector);
     //Serial.println(detector.detectionState);
     //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
-    if(detector.detectionState == 10){
-        testServo();
-    }
+    
+    //if(detector.detectionState == 10){
+    //   testServo();
+    //}
+
+    setServoAngle(1);
 }
 
 // NOTES ON DATA TYPES:

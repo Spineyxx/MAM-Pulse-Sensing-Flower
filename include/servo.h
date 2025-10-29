@@ -4,7 +4,9 @@
 #include "peakDetectorState.h"
 
 void setupServo();
+void setServoAngle(int angle);
 void testServo();
 void testServoPeak();
+
 
 #endif

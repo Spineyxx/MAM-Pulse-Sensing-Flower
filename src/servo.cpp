@@ -12,6 +12,9 @@ void setupServo(){
   pinMode(LED,OUTPUT);
 }
 
+void setServoAngle(int angle){
+  myServo.write(angle); 
+}
 
 void testServo(){
     static uint8_t servoCounter = 0;
