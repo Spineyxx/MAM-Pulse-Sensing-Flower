@@ -3,6 +3,7 @@
 #include "detectPeaks.h"
 #include "ledStrip.h"
 #include "peakDetectorState.h"
+#include "flowerState.h"
 #include "readSensor.h"
 #include "servo.h"
 
@@ -12,7 +13,9 @@ PeakDetectorState detector = {.signalBuffer = {0},
                               .signalState = 'r',
                               .detectionState = 0};
 
-
+FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
+                            .isOpen = false};
+                            
 // the setup function is called once (when the program starts)
 void setup() {
     Serial.begin(115200);
@@ -32,7 +35,6 @@ void loop() {
     //   testServo();
     //}
 
-    setServoAngle(1);
 }
 
 // NOTES ON DATA TYPES:
