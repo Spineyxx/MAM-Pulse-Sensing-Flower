@@ -90,6 +90,9 @@ void handleFlower(FlowerState* flower, PeakDetectorState* detector, uint8_t peak
         }
     }
     //printoutFlowerDebug(flower, peakCounter); // debug output to serial monitor
+
+    //*************************************************************
+
     }
 
     void printoutFlowerDebug(FlowerState* flower, uint16_t peakCounter) {
@@ -104,14 +107,3 @@ void handleFlower(FlowerState* flower, PeakDetectorState* detector, uint8_t peak
         Serial.print(myServo.read());
         Serial.print("\n");
     }
-
-// Brainstorming Methods
-//  - have one method "toggleFlower()" (have to know and maybe check current
-//  state)
-//  - instead have one method "openFlower()" and one method "closeFlower()"
-//  - flower struct with current angle and bool for if closed or open? ->
-
-// have closeFlower and openFlower function
-// closeFlower also when finger off, detector übergabe für handleFlower
-
-// read current angle every time or assume that it was set correctly?
