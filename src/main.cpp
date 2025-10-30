@@ -14,7 +14,9 @@ PeakDetectorState detector = {.signalBuffer = {0},
                               .detectionState = 0};
 
 FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
-                            .motion = 0}; //0 = closed, 1 = opening, 2 = open, 3 = closing
+                    .servoCounter = 0,
+                    .motion = 0, //0 = closed, 1 = opening, 2 = open, 3 = closing
+                    .lastMotionTimestamp = 0}; //0 = closed, 1 = opening, 2 = open, 3 = closing
                             
 // the setup function is called once (when the program starts)
 void setup() {
@@ -31,7 +33,8 @@ void loop() {
 
     //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
 
-    handleFlower(&flower, peak);
+    //setSafeAngle(45);
+    handleFlower(&flower, &detector, peak);
 
 }
 

@@ -121,7 +121,7 @@ uint8_t detectPeaks(PeakDetectorState *detector) {
 
     // plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger,
     // (int)detector->detectionState);
-    plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
+    //plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
 
     // save signal values for next iteration
     irSmooth_prev = irSmooth;
