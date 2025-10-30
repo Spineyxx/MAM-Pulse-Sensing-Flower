@@ -3,7 +3,9 @@
 #include "detectPeaks.h"
 #include "ledStrip.h"
 #include "peakDetectorState.h"
+#include "flowerState.h"
 #include "readSensor.h"
+#include "servo.h"
 
 PeakDetectorState detector = {.signalBuffer = {0},
                               .bufferIndex = 0,
@@ -14,20 +16,29 @@ PeakDetectorState detector = {.signalBuffer = {0},
                               .hrIntervalIndex = 0,
                               .detectionState = 0};
 
-
+FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
+                    .servoCounter = 0,
+                    .motion = 0, //0 = closed, 1 = opening, 2 = open, 3 = closing
+                    .lastMotionTimestamp = 0}; //0 = closed, 1 = opening, 2 = open, 3 = closing
+                            
 // the setup function is called once (when the program starts)
 void setup() {
     Serial.begin(115200);
     //testStripSetup(); // zum Testen der LEDs nötig ~LINDA
-    setupSensor();  // zum Testen des Sensors nötig ~ANNA
+    setupSensor();
+    setupServo();
 }
 
 // after the setup() function returned, the loop function is called in an endless loop
 void loop() {
-    getPulseOxySignal(&detector);  // zum Testen des Sensors nötig ~ANNA
-    int peak = detectPeaks(&detector);
-    //Serial.println(peak);
+    getPulseOxySignal(&detector);
+    uint8_t peak = detectPeaks(&detector); //returns 1 if a peak is detected, else 0
+
     //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
+
+    //setSafeAngle(45);
+    handleFlower(&flower, &detector, peak);
+
 }
 
 // NOTES ON DATA TYPES:
