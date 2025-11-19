@@ -6,6 +6,7 @@ MAX30105 particleSensor;
 
 void setupSensor() {
     // Initialize sensor
+    Wire.begin(26,27);
     if (!particleSensor.begin(
             Wire, I2C_SPEED_FAST))  // Use default I2C port, 400kHz speed
     {

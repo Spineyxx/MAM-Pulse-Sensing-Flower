@@ -4,27 +4,38 @@
 #include "ledStrip.h"
 #include "peakDetectorState.h"
 #include "readSensor.h"
+#include "colorChange.h"
 
 PeakDetectorState detector = {.signalBuffer = {0},
                               .bufferIndex = 0,
                               .lastPeak = 0,
+                              .peakBeforeLast = 0,
                               .signalState = 'r',
-                              .detectionState = 0};
+                              .hrInterval = {0},
+                              .hrIntervalIndex = 0,
+                              .detectionState = 0,
+                              .peakDetected = 0};
 
 
 // the setup function is called once (when the program starts)
 void setup() {
     Serial.begin(115200);
-    testStripSetup(); // zum Testen der LEDs nötig ~LINDA
-    //setupSensor();  // zum Testen des Sensors nötig ~ANNA
+    setupSensor();  // zum Testen des Sensors nötig ~ANNA
+    setupStripPulse();
+    //testStripSetup(); // ~LINDA
 }
 
 // after the setup() function returned, the loop function is called in an endless loop
 void loop() {
-    //getPulseOxySignal(&detector);  // zum Testen des Sensors nötig ~ANNA
+    getPulseOxySignal(&detector);  // zum Testen des Sensors nötig ~ANNA
     int peak = detectPeaks(&detector);
-    Serial.println(peak);
-    testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
+    //Serial.println(peak);
+    strip_pulse(&detector);
+    //loopRING(&detector);
+    //activateLEDsOnce(detectPeaks(&detector)); // ~LINDA
+    //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
+    //functiontestLEDSTrip(); Zum Testen ob der LEDStrip eh funktioniert
+    
 }
 
 // NOTES ON DATA TYPES:
