@@ -131,6 +131,7 @@ uint8_t detectPeaks(PeakDetectorState *detector) {
 
     // move index to next position
     detector->bufferIndex = (detector->bufferIndex + 1) % 50;
+    detector->peakDetected = peakDetected;
     return peakDetected; //returns 0, unless peak was detected -> 1
 }
 

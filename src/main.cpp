@@ -6,6 +6,7 @@
 #include "flowerState.h"
 #include "readSensor.h"
 #include "servo.h"
+#include "colorChange.h"
 
 PeakDetectorState detector = {.signalBuffer = {0},
                               .bufferIndex = 0,
@@ -25,8 +26,10 @@ FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
 void setup() {
     Serial.begin(115200);
     //testStripSetup(); // zum Testen der LEDs nötig ~LINDA
+    //setupServo();
     setupSensor();
-    setupServo();
+    //setupStripPulse();
+    //testStripSetup(); // ~LINDA
 }
 
 // after the setup() function returned, the loop function is called in an endless loop
@@ -37,8 +40,15 @@ void loop() {
     //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
 
     //setSafeAngle(45);
-    handleFlower(&flower, &detector, peak);
+    //handleFlower(&flower, &detector, peak);
 
+    //Serial.println(peak);
+    //strip_pulse(&detector);
+    //loopRING(&detector);
+    //activateLEDsOnce(detectPeaks(&detector)); // ~LINDA
+    //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
+    //functiontestLEDSTrip(); Zum Testen ob der LEDStrip eh funktioniert
+    
 }
 
 // NOTES ON DATA TYPES:
