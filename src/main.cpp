@@ -16,7 +16,9 @@ PeakDetectorState detector = {.signalBuffer = {0},
                               .hrInterval = {0},
                               .hrIntervalIndex = 0,
                               .detectionState = 0,
-                              .peakDetected = 0};
+                              .peakDetected = 0,
+                              .chillVariable = 'u',
+                              .calmUntilMillis = 0};
 
 FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
                     .servoCounter = 0,
@@ -79,4 +81,5 @@ void loop() {
 // detector->hrInterval[hrIntervalIndex]
 // ^ dean bruchscht du wahrscheinlich, domit du adaptiera kannsch wia 
 // schnell sich LEDs fortbewegan, wenn die Intervalle kürzer werden
+// EDIT: I han da array jetzt auf 20 Intervalle erweitert
 //=========================================================================

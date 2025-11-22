@@ -8,6 +8,9 @@
 // -> too high threshold might lead to no detection at all though
 #define FINGER_ON_THRESHOLD 40000
 
+// How long to hold the 'calm' state once detected (milliseconds)
+#define CALM_HOLD_MS 15000
+
 void detectPeaks(PeakDetectorState *detector) {
     uint32_t potentialPeak = 0;
     static char derivPrev = 'r';  // r = rising; f = falling
@@ -20,10 +23,10 @@ void detectPeaks(PeakDetectorState *detector) {
 
     detector->peakDetected = 0; // reset peak detected flag
 
-    // Calculating the average of last 5 samples (irSmooth) and last 50 samples (irBaseline):
     uint32_t sumSmooth = 0;
     uint32_t sumBaseline = 0;
 
+    // Calculating the average of last 5 samples (irSmooth) and last 50 samples (irBaseline):
     for (uint8_t i = 0; i < 5; i++) {  // take last 5 of the array that holds last 50
         uint8_t index = ((detector->bufferIndex - i + 50) % 50);  // to not go beyond bounds of array
         sumSmooth += detector->signalBuffer[index];
@@ -75,28 +78,28 @@ void detectPeaks(PeakDetectorState *detector) {
                     detector->peakBeforeLast = detector->lastPeak;
                     detector->lastPeak = potentialPeak;
                     detector->hrIntervalIndex = detector->detectionState - 5;
-                    detector->hrInterval[detector->hrIntervalIndex] =
-                        detector->lastPeak - detector->peakBeforeLast;
+                    detector->hrInterval[detector->hrIntervalIndex] = detector->lastPeak - detector->peakBeforeLast;
                     detector->detectionState++;
                     break;
                 case 10:  // ONLY AT DETECTOR STATE 10 -> PEAK DETECTION IS VALID
                     uint32_t diff = potentialPeak - detector->lastPeak;
-                    uint32_t hrIntervalSum = 0;
-                    for (uint8_t i = 0; i <= 4; i++) {  // build sum of last 5 intervals
-                        hrIntervalSum += detector->hrInterval[i];
+                    uint32_t hrIntervalFiveSum = 0;
+                    // calculate sum of last 5 intervals
+                    for (uint8_t i = 0; i < 5; i++) {
+                        int idx = detector->hrIntervalIndex - i;
+                        if (idx < 0) idx += 20; // avoid negative index after 21st interval
+                        hrIntervalFiveSum += detector->hrInterval[idx];
                     }
-                    if (diff > ((hrIntervalSum / 5) * 0.8)) {
-                        //the peak is valid when the interval is > 80% of the average of the last 5 intervals
+                    if (diff > ((hrIntervalFiveSum / 5) * 0.8)) { //the peak is valid when the interval is > 80% of the average of the last 5 intervals
                         detector->peakBeforeLast = detector->lastPeak;
                         detector->lastPeak = potentialPeak;
-                        if (detector->hrIntervalIndex < 4) { // move index forward
+                        if (detector->hrIntervalIndex < 19) { // move index forward
                             detector->hrIntervalIndex++;
                         } else {
                             detector->hrIntervalIndex = 0;
                         }
                         detector->hrInterval[detector->hrIntervalIndex] = diff; //save the new interval
                         detector->peakDetected = 1; // set return variable to 1 to indicate peak detection
-                        // peakTest();
 
                         if (triggered) { //this is just for visualization in the serial plotter
                             trigger = irBaseline - 200;
@@ -123,15 +126,65 @@ void detectPeaks(PeakDetectorState *detector) {
     // Uncomment the line below to visualize signal, smoothed signal and trigger in Serial Plotter
     //plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
 
+    decideCalmness(detector); // decide calmness state based on HR intervals
+
     // save signal values for next iteration
     irSmooth_prev = irSmooth;
     derivPrev = detector->signalState;
 
     // move index to next position
     detector->bufferIndex = (detector->bufferIndex + 1) % 50;
+
 }
 
-// Serial Plotter - HR Peak Detection - plot 3 signals
+void decideCalmness(PeakDetectorState *detector) {
+    if (detector->detectionState == 10) { //only check for calmness if finger is on and peak detection is initialized
+
+        uint32_t hrIntervalSum = 0;
+        uint8_t intervalsFound = 0;
+
+        // Determine index of the most-recent stored interval (previous slot)
+        uint8_t prevIndex = detector->hrIntervalIndex - 1;
+        if (prevIndex < 0) prevIndex += 20;
+
+        // Get last 20 intervals (or fewer if not yet available)
+        for (uint8_t i = 0; i < 20 && intervalsFound < 5; i++) {
+            int j = prevIndex - i;
+            if (j < 0) j += 20;
+            uint16_t val = detector->hrInterval[j];
+            if (val != 0) {
+                hrIntervalSum += val;
+                intervalsFound++;
+            }
+        }
+
+        if (intervalsFound == 0) { //cannot happen due to detectionState but still just in case
+            detector->chillVariable = 'u';
+        } else {
+            uint32_t hrIntervalAvg = hrIntervalSum / intervalsFound;
+
+            // Use the most-recent stored interval for the deviation check
+            uint16_t lastInterval = detector->hrInterval[prevIndex];
+            // Serial.println(lastInterval/hrIntervalAvg*100); //debug output to see deviation in percent
+
+            // upper bound in case of missed peak
+            if ((uint32_t)lastInterval >= hrIntervalAvg * 85 / 100 && (uint32_t)lastInterval <= hrIntervalAvg * 115 / 100) {
+                detector->chillVariable = 'c';
+                detector->calmUntilMillis = millis() + CALM_HOLD_MS;
+            } else if ((uint32_t)(detector->calmUntilMillis - (uint32_t)millis()) > 0) {
+                // still within hold window
+                detector->chillVariable = 'c';
+            } else {
+                detector->chillVariable = 'u';
+            }
+        }
+    }else{
+        detector->chillVariable = 'u'; // undefined
+    }
+    plot(detector->detectionState, detector->peakDetected, detector->chillVariable);
+}
+
+// Serial Plotter function - HR Peak Detection - plot 3 signals
 void plot(int val1, int val2, int val3) {
     Serial.print(val1);
     Serial.print("\t");
