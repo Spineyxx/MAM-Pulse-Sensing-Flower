@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 typedef struct {
-    uint16_t signalBuffer[50]; // this holds the last 50 raw sensor readings
+    uint16_t signalBuffer[50]; // this holds the last 50 raw sensor readings (not averaged)
     uint8_t bufferIndex; // index for the signalBuffer array
     uint32_t lastPeak; // timestamp of the last detected peak
     uint32_t peakBeforeLast; // timestamp of the peak before the last detected peak
@@ -11,6 +11,8 @@ typedef struct {
     uint16_t hrInterval[5]; // holds the last 5 heart rate intervals
     uint8_t hrIntervalIndex; // index for the hrInterval array
     uint8_t detectionState; // state of the peak detection algorithm - 10 means fully initialized
+    uint8_t peakDetected; //is 1 if peak detected in current cycle, else 0
+    char chillVariable; //Variablenname von meiner Mitbewohnerin ;) -> 'c' for calm, 'u' for undefined
 } PeakDetectorState;
 
 #endif

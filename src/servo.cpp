@@ -68,7 +68,7 @@ void openFlower(FlowerState* flower) {
 
 
 // Handles flower opening and closing algorithm based on peak detection
-void handleFlower(FlowerState* flower, PeakDetectorState* detector, uint8_t peak) {
+void handleFlower(FlowerState* flower, PeakDetectorState* detector) {
     static uint16_t peakCounter = 0;
 
     //*********************** TESTING BLOCK ***********************
@@ -79,7 +79,7 @@ void handleFlower(FlowerState* flower, PeakDetectorState* detector, uint8_t peak
         closeFlower(flower);
     }else{
 
-        if (peak == 1) {
+        if (detector->peakDetected == 1) {
             peakCounter++; //count detected peaks
         }
     

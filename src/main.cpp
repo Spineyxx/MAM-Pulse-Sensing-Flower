@@ -15,7 +15,8 @@ PeakDetectorState detector = {.signalBuffer = {0},
                               .signalState = 'r',
                               .hrInterval = {0},
                               .hrIntervalIndex = 0,
-                              .detectionState = 0};
+                              .detectionState = 0,
+                              .peakDetected = 0};
 
 FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
                     .servoCounter = 0,
@@ -26,7 +27,7 @@ FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
 void setup() {
     Serial.begin(115200);
     //testStripSetup(); // zum Testen der LEDs nötig ~LINDA
-    //setupServo();
+    setupServo();
     setupSensor();
     //setupStripPulse();
     //testStripSetup(); // ~LINDA
@@ -35,12 +36,12 @@ void setup() {
 // after the setup() function returned, the loop function is called in an endless loop
 void loop() {
     getPulseOxySignal(&detector);
-    uint8_t peak = detectPeaks(&detector); //returns 1 if a peak is detected, else 0
+    detectPeaks(&detector); //returns 1 if a peak is detected, else 0
 
     //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
 
     //setSafeAngle(45);
-    //handleFlower(&flower, &detector, peak);
+    handleFlower(&flower, &detector);
 
     //Serial.println(peak);
     //strip_pulse(&detector);

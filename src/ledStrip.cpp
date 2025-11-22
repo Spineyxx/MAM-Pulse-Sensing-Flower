@@ -163,7 +163,7 @@ void updateRing() {
 }
 
 void loopRING(PeakDetectorState *detector){
-  if(detectPeaks(detector) == 1){
+  if(detector->peakDetected == 1){
     pulseRing();
   }
   updateRing();
