@@ -3,9 +3,9 @@
 #include <Arduino.h>
 #include "peakDetectorState.h"
 
-//void peakTest();
 void detectPeaks(PeakDetectorState *detector);
 void decideCalmness(PeakDetectorState *detector);
-void plot(int val1, int val2, int val3);
+void plot(uint16_t val1, u_int16_t val2, u_int16_t val3);
+void printoutCalmnessDebug(PeakDetectorState *detector);
 
 #endif

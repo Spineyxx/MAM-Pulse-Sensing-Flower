@@ -69,7 +69,7 @@ void openFlower(FlowerState* flower) {
 
 // Handles flower opening and closing algorithm based on peak detection
 void handleFlower(FlowerState* flower, PeakDetectorState* detector) {
-    static uint16_t peakCounter = 0;
+    static uint16_t peakCounter = 0; //get rid of peakCounter later
 
     //*********************** TESTING BLOCK ***********************
     // replace with logic on when to open and close flower
@@ -78,22 +78,24 @@ void handleFlower(FlowerState* flower, PeakDetectorState* detector) {
         peakCounter = 0;  // reset counter when finger is off
         closeFlower(flower);
     }else{
-
-        if (detector->peakDetected == 1) {
-            peakCounter++; //count detected peaks
-        }
-    
-        if (peakCounter >= 15) { //close after 15 peaks detected
-            closeFlower(flower);
-        } else if (peakCounter >= 2) { //open after 2 peaks detected
+        if (detector->chillVariable == 'c') {
             openFlower(flower);
         }
+    //    if (detector->peakDetected == 1) {
+    //        peakCounter++; //count detected peaks
+    //    }
+    
+    //    if (peakCounter >= 15) { //close after 15 peaks detected
+    //        closeFlower(flower);
+    //    } else if (peakCounter >= 2) { //open after 2 peaks detected
+    //        openFlower(flower);
+    //    }
     }
+}
     //printoutFlowerDebug(flower, peakCounter); // debug output to serial monitor
 
     //*************************************************************
 
-    }
 
     void printoutFlowerDebug(FlowerState* flower, uint16_t peakCounter) {
         Serial.print(peakCounter);

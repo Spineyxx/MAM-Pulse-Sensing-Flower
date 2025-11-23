@@ -16,8 +16,10 @@ PeakDetectorState detector = {.signalBuffer = {0},
                               .hrInterval = {0},
                               .hrIntervalIndex = 0,
                               .detectionState = 0,
+                              .fingerOnSinceMillis = 0,
                               .peakDetected = 0,
                               .chillVariable = 'u',
+                              .hrRatio = 0.0,
                               .calmUntilMillis = 0};
 
 FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
