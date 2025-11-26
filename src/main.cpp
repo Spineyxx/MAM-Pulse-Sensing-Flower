@@ -7,6 +7,7 @@
 #include "readSensor.h"
 #include "servo.h"
 #include "colorChange.h"
+#include "btSound.h"
 
 PeakDetectorState detector = {.signalBuffer = {0},
                               .bufferIndex = 0,
@@ -35,6 +36,7 @@ void setup() {
     setupSensor();
     //setupStripPulse();
     //testStripSetup(); // ~LINDA
+    setupBT();
 }
 
 // after the setup() function returned, the loop function is called in an endless loop
@@ -46,6 +48,8 @@ void loop() {
 
     //setSafeAngle(45);
     handleFlower(&flower, &detector);
+    handleBT(&flower);
+    
 
     //Serial.println(peak);
     //strip_pulse(&detector);
