@@ -7,7 +7,7 @@
 #include "MAX30105.h"           // library: Sparkfun MAX3010x
 
 #define LED_BUILTIN 2
-#define LED_PIN 4
+#define LED_PIN 12
 #define LED_COUNT 23
 #define LED_COUNT_STRIP 16
 #define LED_COUNT_RING 7

@@ -5,6 +5,8 @@
 #include "peakDetectorState.h"
 #include "flowerState.h"
 
+#define SERVO_PIN 14
+
 void setupServo();
 void testServo();
 void testServoPeak();

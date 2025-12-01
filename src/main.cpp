@@ -33,7 +33,7 @@ void setup() {
     //testStripSetup(); // zum Testen der LEDs nötig ~LINDA
     setupServo();
     setupSensor();
-    //setupStripPulse();
+    setupStripPulse();
     //testStripSetup(); // ~LINDA
 }
 
@@ -48,11 +48,11 @@ void loop() {
     handleFlower(&flower, &detector);
 
     //Serial.println(peak);
-    //strip_pulse(&detector);
+    strip_pulse(&detector);
     //loopRING(&detector);
     //activateLEDsOnce(detectPeaks(&detector)); // ~LINDA
     //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
-    //functiontestLEDSTrip(); Zum Testen ob der LEDStrip eh funktioniert
+    //functiontestLEDSTrip(); //Zum Testen ob der LEDStrip eh funktioniert
     
 }
 

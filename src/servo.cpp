@@ -5,8 +5,6 @@
 #include "flowerState.h"
 #include "peakDetectorState.h"
 
-#define SERVO_PIN 14
-
 Servo myServo;
 
 void setupServo() {

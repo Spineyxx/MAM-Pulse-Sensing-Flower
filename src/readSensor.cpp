@@ -11,7 +11,7 @@ MAX30105 particleSensor;
 // SDA to ESP32 SDA (GPIO21) - unless pin is changed in Wire.begin
 
 void setupSensor() { //Initialization of sensor
-    //Wire.begin(26,27); //changing I2C pins to 26 and 27
+    Wire.begin(26,27); //changing I2C pins to 26 and 27
     if (!particleSensor.begin(
             Wire, I2C_SPEED_FAST))  // 400kHz speed
     {
