@@ -3,6 +3,7 @@
 #include "MAX30105.h"  // library: Sparkfun MAX3010x
 
 MAX30105 particleSensor;
+uint8_t sensorAvailable = 0; // used as a condition for the LED strip pulse function
 
 // SENSOR CONNECTIONS:
 // VIN to 3.3V
@@ -16,6 +17,7 @@ void setupSensor() { //Initialization of sensor
             Wire, I2C_SPEED_FAST))  // 400kHz speed
     {
         Serial.println("MAX30105 was not found. Please check wiring/power. ");
+        sensorAvailable = 0;
         while (1);
     }
 
@@ -30,6 +32,7 @@ void setupSensor() { //Initialization of sensor
     particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate,
                          pulseWidth,
                          adcRange);  // Configure sensor with these settings
+    sensorAvailable = 1;
 
     
     //===========================================================================

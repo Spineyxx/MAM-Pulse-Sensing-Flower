@@ -9,7 +9,7 @@ Servo myServo;
 
 void setupServo() {
     myServo.setPeriodHertz(50);            // 50 Hz for servos
-    myServo.attach(SERVO_PIN, 500, 2500);  // Pin 18, min/max pulse width
+    myServo.attach(SERVO_PIN, 500, 2500);  // Pin 14, min/max pulse width
     myServo.write(FLOWER_CLOSED_ANGLE);    // start with flower closed -> snaps shut after startup
 }
 

@@ -2,10 +2,12 @@
 
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
+#include "readSensor.h"
 #include "peakDetectorState.h"
 #include "MAX30105.h"           // library: Sparkfun MAX3010x
 #include "ledStrip.h"
 #include "detectPeaks.h"
+
 
 // Create an instance of the Adafruit_NeoPixel class called 'strip' with the appropriate number of pixels, pin, and type
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
@@ -18,7 +20,7 @@ uint16_t LED_fade_duration = 10; //how often a fade step is performed           
 // für INI
 uint32_t colorSequence[] = { RED, YELLOW, CYAN, PURPLE };
 int colorSequenceLength = sizeof(colorSequence) / sizeof(colorSequence[0]);
-uint8_t sensorAvailable = 0;
+//uint8_t sensorAvailable = 0;
 
 // für RING
 static bool ringActive = false;
@@ -77,7 +79,7 @@ uint32_t INI_getActColor() {
 }
 
 void setupStripPulse() {
-  // initialize sensor sequence habi glöscht, des wird scho in getPulseOxySignal gemacht
+  // initialize sensor LED strip
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'  
 }

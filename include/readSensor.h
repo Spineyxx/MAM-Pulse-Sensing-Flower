@@ -6,4 +6,6 @@
 void setupSensor();
 void getPulseOxySignal(PeakDetectorState* detector);
 
+extern uint8_t sensorAvailable;
+
 #endif

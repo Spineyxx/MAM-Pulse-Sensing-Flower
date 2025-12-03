@@ -40,12 +40,14 @@ void setup() {
 // after the setup() function returned, the loop function is called in an endless loop
 void loop() {
     getPulseOxySignal(&detector);
-    detectPeaks(&detector); //returns 1 if a peak is detected, else 0
+    detectPeaks(&detector); 
 
     //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
 
     //setSafeAngle(45);
-    handleFlower(&flower, &detector);
+    //handleFlower(&flower, &detector);
+    //openFlower(&flower);
+
 
     //Serial.println(peak);
     strip_pulse(&detector);
