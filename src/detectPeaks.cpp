@@ -129,7 +129,7 @@ void detectPeaks(PeakDetectorState *detector) {
 
     //============================================================================================================================================
     // Uncomment the line below to visualize signal, smoothed signal and trigger in Serial Plotter
-    //plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
+    plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
     //============================================================================================================================================
 
     decideCalmness(detector); // decide calmness state based on HR intervals

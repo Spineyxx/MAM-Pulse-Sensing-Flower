@@ -31,20 +31,34 @@
 #include <ESP32PWM.h>
 
 //Sound data
-#include "piano.h"
+#include "music.h"
 
 BluetoothA2DPSource a2dp_source;
-SoundData pianoSound((int16_t*)piano_raw, piano_raw_len/2); 
-SoundMixer mixer{&pianoSound};
+SoundData musicSound((int16_t*)music_raw, music_raw_len/2); 
+SoundMixer mixer{&musicSound};
 
 int32_t get_data_frames(Frame *frame, int32_t frame_count) {
+    static uint32_t callbackCount = 0;
+    callbackCount++;
+    Serial.print("A2DP callback #");
+    Serial.print(callbackCount);
+    Serial.print(" | playing: ");
+    Serial.print(musicSound.playing);
+    Serial.print(" | pos: ");
+    Serial.print(musicSound.pos);
+    Serial.print(" / ");
+    Serial.print(musicSound.len);
+    Serial.print("\n");
     for (int sample = 0; sample < frame_count; ++sample) {
-        if (pianoSound.playing && (int)pianoSound.pos < pianoSound.len) {
-            int16_t value = pianoSound.data[(int)pianoSound.pos];
+        if (musicSound.playing && (int)musicSound.pos < musicSound.len) {
+            int16_t value = musicSound.data[(int)musicSound.pos];
             frame[sample].channel1 = value;
             frame[sample].channel2 = value;
-            pianoSound.pos += pianoSound.playbackSpeedFactor;
+            musicSound.pos += musicSound.playbackSpeedFactor;
         } else {
+            // Loop: restart playback from beginning
+            musicSound.pos = 0;
+            musicSound.playing = true;
             frame[sample].channel1 = 0;
             frame[sample].channel2 = 0;
         }
@@ -83,10 +97,24 @@ void handleBT(FlowerState *flower){
     bool connected = a2dp_source.is_connected();
 
     if (connected && !wasConnected) {
-        pianoSound.play();
         Serial.println("Bluetooth connected: starting playback from beginning.");
-    }else if(connected){
+        musicSound.play();
+        Serial.print("musicSound.play() called. playing: ");
+        Serial.print(musicSound.playing);
+        Serial.print(" | pos: ");
+        Serial.print(musicSound.pos);
+        Serial.print(" / ");
+        Serial.print(musicSound.len);
+        Serial.print("\n");
+    } else if (connected) {
         mixer.advancePositions();
+        Serial.print("BT still connected. mixer.advancePositions() called. pos: ");
+        Serial.print(musicSound.pos);
+        Serial.print(" / ");
+        Serial.print(musicSound.len);
+        Serial.print("\n");
     }
     wasConnected = connected;
+
+    
 }
