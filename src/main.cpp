@@ -32,7 +32,7 @@ FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
 void setup() {
     Serial.begin(115200);
     //testStripSetup(); // zum Testen der LEDs nötig ~LINDA
-    //setupServo();
+    setupServo();
     setupSensor();
     setupStripPulse();
     //testStripSetup(); // ~LINDA
@@ -43,16 +43,12 @@ void setup() {
 void loop() {
     getPulseOxySignal(&detector);
     detectPeaks(&detector); 
-
-    //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
-
-    //setSafeAngle(45);
+    //setSafeAngle(45); //use this to set servo to open position if you insert the servo into the flower
     handleFlower(&flower, &detector);
     handleBT(&flower, &detector);
-    
-
-    //Serial.println(peak);
     strip_pulse(&detector);
+
+    //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA
     //loopRING(&detector);
     //activateLEDsOnce(detectPeaks(&detector)); // ~LINDA
     //testStripLoop(&detector); // zum Testen der LEDs nötig ~LINDA

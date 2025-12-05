@@ -31,7 +31,7 @@
 #include <ESP32PWM.h>
 
 //Sound data
-#include "heart_beat_once.h"
+#include "heartBeatOnce.h"
 
 //================================================================================================
 // INSERT THE NAME OF YOUR BLUETOOTH SPEAKER/HEADPHONES HERE
@@ -40,7 +40,7 @@ const char* soundboxSSID = "SoundCore mini"; //e.g. "SoundCore mini" is for Anke
 //================================================================================================
 
 BluetoothA2DPSource a2dp_source;
-SoundData beatSound((int16_t*)heart_beat_once_raw, heart_beat_once_raw_len/2); 
+SoundData beatSound((int16_t*)heartBeatOnce_raw, heartBeatOnce_raw_len/2); 
 SoundMixer mixer{&beatSound};
 
 int32_t get_data_frames(Frame *frame, int32_t frame_count) {
@@ -93,7 +93,7 @@ void handleBT(FlowerState *flower, PeakDetectorState *detector){
     }
     // Peak detected: start beat sound
     if (connected && detector->peakDetected == 1) {
-        uint32_t interval = detector->hrInterval[detector->hrIntervalIndex];
+        uint32_t interval = detector->hrInterval[detector->hrIntervalIndex-1];
         //set speed of playback depending on HR interval
         if (interval > 0) {
             float playbackSpeed = (float)beatSound.len /((float)interval*10);

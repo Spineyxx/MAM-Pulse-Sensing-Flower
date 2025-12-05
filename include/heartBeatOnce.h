@@ -3,7 +3,7 @@
 
 #pragma once
 
-const short heart_beat_once_raw[] = {
+const short heartBeatOnce_raw[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -3418,4 +3418,4 @@ const short heart_beat_once_raw[] = {
     273, 265, 258, 252, 246, 239, 234, 227, 221, 215, 209
 };
 
-const unsigned int heart_beat_once_raw_len = 40943;
+const unsigned int heartBeatOnce_raw_len = 40943;

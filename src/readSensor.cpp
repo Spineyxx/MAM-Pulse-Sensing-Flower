@@ -8,8 +8,8 @@ uint8_t sensorAvailable = 0; // used as a condition for the LED strip pulse func
 // SENSOR CONNECTIONS:
 // VIN to 3.3V
 // GND to GND
-// SCL to ESP32 SCL (GPIO22) - unless pin is changed in Wire.begin
-// SDA to ESP32 SDA (GPIO21) - unless pin is changed in Wire.begin
+// SCL to ESP32 SCL (GPIO22) - unless pin is changed at Wire.begin
+// SDA to ESP32 SDA (GPIO21) - unless pin is changed at Wire.begin
 
 void setupSensor() { //Initialization of sensor
     Wire.begin(26,27); //changing I2C pins to 26 and 27
@@ -33,24 +33,6 @@ void setupSensor() { //Initialization of sensor
                          adcRange);  // Configure sensor with these settings
     sensorAvailable = 1;
 
-    
-    //===========================================================================
-    // SAMPLE CODE - UP FOR DELETION WHEN WORK IS DONE
-    //---------------------------------------------------------------------------
-    // Arduino plotter auto-scales annoyingly. To get around this, pre-populate
-    // the plotter with 500 of an average reading from the sensor
-    // Take an average of IR readings at power up
-    // const byte avgAmount = 64;
-    // long baseValue = 0;
-    // for (byte x = 0 ; x < avgAmount ; x++)
-    //{
-    //   baseValue += particleSensor.getIR(); //Read the IR value
-    // }
-    // baseValue /= avgAmount;
-    // Pre-populate the plotter so that the Y scale is close to IR values
-    // for (int x = 0 ; x < 500 ; x++)
-    //   Serial.println(baseValue);
-    //===========================================================================
 };
 
 void getPulseOxySignal(PeakDetectorState *detector) {
