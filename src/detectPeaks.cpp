@@ -12,8 +12,6 @@ void detectPeaks(PeakDetectorState *detector) {
     // Variables for Serial Plotter visualization:
     static uint16_t trigger = 0;
     static bool triggered = false;
-    static int16_t triggerOld = 0;
-    static bool triggeredOld = false;
 
     detector->peakDetected = 0; // reset peak detected flag
 
@@ -104,14 +102,6 @@ void detectPeaks(PeakDetectorState *detector) {
                         }
                     }
             }
-
-            if (triggeredOld) { //for visualisation of the previous peak detection in the serial plotter
-                triggerOld = irBaseline - 200;
-                triggeredOld = false;
-            } else {
-                triggerOld = irBaseline + 200;
-                triggeredOld = true;
-            }
         }
     } else {
         detector->detectionState = 0; // FINGER ON = FALSE --> reset detection state to 0
@@ -120,7 +110,7 @@ void detectPeaks(PeakDetectorState *detector) {
 
     //============================================================================================================================================
     // Uncomment the line below to visualize signal, smoothed signal and trigger in Serial Plotter
-    plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
+    //plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
     //============================================================================================================================================
 
     decideCalmness(detector); // decide calmness state based on HR intervals

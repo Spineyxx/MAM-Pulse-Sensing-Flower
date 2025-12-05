@@ -13,10 +13,9 @@ uint8_t sensorAvailable = 0; // used as a condition for the LED strip pulse func
 
 void setupSensor() { //Initialization of sensor
     Wire.begin(26,27); //changing I2C pins to 26 and 27
-    if (!particleSensor.begin(
-            Wire, I2C_SPEED_FAST))  // 400kHz speed
+    if (!particleSensor.begin(Wire, I2C_SPEED_FAST))  // 400kHz speed
     {
-        Serial.println("MAX30105 was not found. Please check wiring/power. ");
+        Serial.println("MAX30105 was not found. Please check wiring/power.");
         sensorAvailable = 0;
         while (1);
     }
