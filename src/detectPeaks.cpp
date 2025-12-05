@@ -9,7 +9,7 @@
 #define FINGER_ON_THRESHOLD 40000
 
 // How long to hold the 'calm' state once detected (milliseconds)
-#define CALM_HOLD_MS 10000
+#define CALM_HOLD_MS 5000
 
 void detectPeaks(PeakDetectorState *detector) {
     static char derivPrev = 'r';  // r = rising; f = falling
@@ -21,8 +21,6 @@ void detectPeaks(PeakDetectorState *detector) {
     // Variables for Serial Plotter visualization:
     static uint16_t trigger = 0;
     static bool triggered = false;
-    static int16_t triggerOld = 0;
-    static bool triggeredOld = false;
 
     detector->peakDetected = 0; // reset peak detected flag
 
@@ -112,14 +110,6 @@ void detectPeaks(PeakDetectorState *detector) {
                             triggered = true;
                         }
                     }
-            }
-
-            if (triggeredOld) { //for visualisation of the previous peak detection in the serial plotter
-                triggerOld = irBaseline - 200;
-                triggeredOld = false;
-            } else {
-                triggerOld = irBaseline + 200;
-                triggeredOld = true;
             }
         }
     } else {

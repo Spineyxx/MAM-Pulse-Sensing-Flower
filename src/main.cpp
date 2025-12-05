@@ -48,7 +48,7 @@ void loop() {
 
     //setSafeAngle(45);
     //handleFlower(&flower, &detector);
-    handleBT(&flower);
+    handleBT(&flower, &detector);
     
 
     //Serial.println(peak);
