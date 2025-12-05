@@ -93,7 +93,10 @@ void handleBT(FlowerState *flower, PeakDetectorState *detector){
     }
     // Peak detected: start beat sound
     if (connected && detector->peakDetected == 1) {
-        uint32_t interval = detector->hrInterval[detector->hrIntervalIndex-1];
+        int idx = (int)detector->hrIntervalIndex-(int)1;
+        if (idx < 0) idx += 20;
+        uint8_t index = (uint8_t) idx;
+        uint32_t interval = detector->hrInterval[index];
         //set speed of playback depending on HR interval
         if (interval > 0) {
             float playbackSpeed = (float)beatSound.len /((float)interval*10);
