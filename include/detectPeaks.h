@@ -16,6 +16,9 @@ void detectPeaks(PeakDetectorState *detector);
 void decideCalmness(PeakDetectorState *detector);
 void plot(uint16_t val1, u_int16_t val2, u_int16_t val3);
 void printoutCalmnessDebug(PeakDetectorState *detector);
+
+
+// used in getCurrentHRInterval & getCurrentHRIntervalAverage for LED strip
 void getCurrentHRInterval(PeakDetectorState *detector);
 void getCurrentHRIntervalAverage(PeakDetectorState *detector);
 
