@@ -3,18 +3,19 @@
 #include "readSensor.h"
 #include "peakDetectorState.h"
 #include "MAX30105.h"           // library: Sparkfun MAX3010x
-#include "ledStrip.h"
+#include "leds.h"
 #include "detectPeaks.h"
 
 
 // Create an instance of the Adafruit_NeoPixel class called 'strip' with the appropriate number of pixels, pin, and type
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
-// für pulse
+// für getActColor
 uint32_t colorSequence[] = { RED, YELLOW, CYAN, PURPLE };
 int colorSequenceLength = sizeof(colorSequence) / sizeof(colorSequence[0]);
-//uint8_t sensorAvailable = 0;
+//
 
+// für stripPulseMulti
 //struct to track each pulse
 struct Sweep { 
     uint8_t pos;
@@ -24,15 +25,22 @@ struct Sweep {
 
 Sweep sweeps[MAX_SWEEPS];   // tracks all active pulses
 uint32_t lastSweepTimestamp = 0;  // timestamp for pulse updates
+bool ringBlockAlwaysOn = false;
+//
+
+// for getHRColor
+const int hrMin = 60;   // blue at this value
+const int hrMax = 120;  // red at this value
+//
 
 
-// LED Strip functions
+
+// setup
 void setupStripPulse() {
-  // initialize sensor LED strip
+  // initialize LED strip
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'  
 }
-
 
 
 // dim all Leds by dimFactor, keep minimum brightness if keepStandbyBrightness is true
@@ -47,12 +55,12 @@ void dimLeds(float dimFactor, uint8_t keepStandbyBrightness) {
     b *= dimFactor;
     if (keepStandbyBrightness) {
       if (i < LED_COUNT -7) { //= first 16 LEDs = LED Strip
-        // keep a bit of glow for standby, this makes purple:
+        // keep a bit of glow for standby, this makes purple/magenta:
         if (r < 3) r = 3;
         if (g < 0) g = 0;
         if (b < 3) b = 3;
       } else {
-        // last 7 LEDs = LED Ring: set a dim white glow
+        // last 7 LEDs = LED Ring, this makes white:
         if (r < 3) r = 3;
         if (g < 3) g = 3;
         if (b < 3) b = 3;
@@ -64,7 +72,7 @@ void dimLeds(float dimFactor, uint8_t keepStandbyBrightness) {
 }
 
 uint32_t fadeColor(uint32_t col1, uint32_t col2, int progress) {
-// note: progress: 0..COLORS_FADE_STEPS
+// progress from 0 to COLORS_FADE_STEPS
     uint8_t r1 = (col1 >> 16) & 0xFF;
     uint8_t g1 = (col1 >> 8) & 0xFF;
     uint8_t b1 = col1 & 0xFF; 
@@ -93,10 +101,9 @@ uint32_t getActColor() { // goes through fixed sequence of colors
   return c;
 }
 
-const int hrMin = 60;   // blue at this value
-const int hrMax = 120;  // red at this value
 
-// Map currentHR to a color from blue to green to yellow to orange to red
+
+// Map current HR to a color from blue to green to yellow to orange to red
 uint32_t getHRColor(int currentHRAverage) { 
   
   // Clamp currentHRAverage to range
@@ -123,8 +130,8 @@ uint32_t getHRColor(int currentHRAverage) {
   return fadeColor(colors[idx1], colors[idx2], progress); // fading of colors
 }
 
-
-void strip_pulse(PeakDetectorState *detector) {
+// Pulses using getActColor for color sequence, goes through fixed sequence
+void stripPulse(PeakDetectorState *detector) {
   static uint8_t pos = 0;
   static uint32_t timestamp = 0;
   static uint8_t active = 0;
@@ -145,7 +152,7 @@ void strip_pulse(PeakDetectorState *detector) {
   int minStep = 3;   // very fast movement at high HR
   int maxStep = 20;  // slow movement at low HR
 
-  float hrFraction = float(currentHR - hrMin) / float(hrMax - hrMin);
+  float hrFraction = float(currentHRAverage - hrMin) / float(hrMax - hrMin);
   hrFraction = constrain(hrFraction, 0.0, 1.0);
 
   int stepTime = maxStep - hrFraction * (maxStep - minStep);
@@ -167,11 +174,10 @@ void strip_pulse(PeakDetectorState *detector) {
   }
 }
 
-bool ringBlockAlwaysOn = false;
 
-void strip_pulseMulti(PeakDetectorState *detector) {
+void stripPulseMulti(PeakDetectorState *detector) {
 
-    // Start new sweep if a peak is detected
+    // Start a new sweep if a peak is detected
     if (sensorAvailable == 1 && detector->detectionState > 0 && detector->peakDetected == 1) {
 
         ringBlockAlwaysOn = true;
@@ -194,7 +200,7 @@ void strip_pulseMulti(PeakDetectorState *detector) {
     int minStep = 3; // very fast at high HR
     int maxStep = 20; // slow at low HR
 
-    float hrFraction = float(currentHR - hrMin) / float(hrMax - hrMin);
+    float hrFraction = float(currentHRAverage - hrMin) / float(hrMax - hrMin);
     hrFraction = constrain(hrFraction, 0.0, 1.0);
 
     int stepTime = maxStep - hrFraction * (maxStep - minStep);
@@ -206,10 +212,10 @@ void strip_pulseMulti(PeakDetectorState *detector) {
         bool keepGlow = (sensorAvailable == 1 && detector->detectionState > 0);
         dimLeds(DIMFACTOR, keepGlow ? 1 : 0);
 
-        // Compute HR color
+        // Compute HR color, needed later again
         uint32_t hrColor = getHRColor(currentHRAverage);
 
-        // update sweep/s
+        // update sweeps
         for (int i = 0; i < MAX_SWEEPS; i++) {
             if (sweeps[i].active) {
 
@@ -247,23 +253,7 @@ void strip_pulseMulti(PeakDetectorState *detector) {
 }
 
 
-// LED Ring functions
-// gleiche Farbe wie bei LED, soll nicht pulsieren
-// wenn Blume aufgeht => Licht weiß?
-void ledRingControl() {
-    // LED indices for the last 7 LEDs (23 total: 16..22)
-    for (int i = 16; i < 23; i++) {
-        strip.setPixelColor(i, strip.Color(255, 255, 255)); // White
-    }
-    strip.show();
-}
-
-
-
-
-
-
-///Testen
+// For testing of hardware
 // Funktion, die alle LEDs rot leuchten lässt, zum Testen ob der LED Strip funktioniert
 void functiontestLEDSTrip() {
   for (int i = 0; i < LED_COUNT; i++) {
@@ -272,8 +262,18 @@ void functiontestLEDSTrip() {
   strip.show();  // Wendet die Änderungen an
 }
 
-//ALT
+// LED Ring functions
+void ledRingControl() {
+    // LED indices for the last 7 LEDs
+    for (int i = 16; i < 23; i++) {
+        strip.setPixelColor(i, strip.Color(255, 255, 255)); // White
+    }
+    strip.show();
+}
+//
 
+
+// old functions
 // für activateLEDsOnce
 int ledPosition = 0;
 uint16_t LED_step_duration = 30; //how long it takes to swap from LED to LED in ms   100  25
@@ -316,7 +316,6 @@ void controlLEDs(PeakDetectorState *detector) {
   }
 }
 
-
 void testStripSetup(){
   strip.begin();
   for (int i = 0; i < LED_COUNT; i++){
@@ -324,7 +323,6 @@ void testStripSetup(){
   }
   strip.show();
 }
-
 
 void testStripLoop(PeakDetectorState *detector){
   detector -> detectionState = 4; //                                              

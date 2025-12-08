@@ -1,12 +1,11 @@
 #include <Adafruit_NeoPixel.h>
 #include <Arduino.h>
 #include "detectPeaks.h"
-#include "ledStrip.h"
+#include "leds.h"
 #include "peakDetectorState.h"
 #include "flowerState.h"
 #include "readSensor.h"
 #include "servo.h"
-#include "colorChange.h"
 #include "btSound.h"
 
 PeakDetectorState detector = {.signalBuffer = {0},
@@ -41,15 +40,15 @@ void setup() {
 void loop() {
     getPulseOxySignal(&detector);
     detectPeaks(&detector); 
-    getCurrentHRInterval(&detector);
-    getCurrentHRIntervalAverage(&detector);
-    //setSafeAngle(45); //use this to set servo to open position if you insert the servo into the flower
-    //handleFlower(&flower, &detector);
-    //handleBT(&flower, &detector);
-    //strip_pulse(&detector);
-    strip_pulseMulti(&detector);
-    //ledRingControl();
-    //functiontestLEDSTrip(); //use this to test if LED strip works
+    //getCurrentHRInterval(&detector); // this gets the current HR in bpm
+    getCurrentHRIntervalAverage(&detector); // this gets the curretn average HR in bpm
+    //setSafeAngle(45); // use this to set servo to open position if you insert the servo into the flower
+    handleFlower(&flower, &detector);
+    handleBT(&flower, &detector);
+    //stripPulse(&detector); // goes through fixed color sequence
+    stripPulseMulti(&detector); // color sequence dependent on HR
+    //ledRingControl(); // use this to light up/test LED ring
+    //functiontestLEDSTrip(); // use this to test if LED strip works
     
 }
 
@@ -59,26 +58,3 @@ void loop() {
 // uint32_t für Werte von 0-4.294.967.295
 // int16_t für Werte von -32.768 bis 32.767
 // int32_t für Werte von -2.147.483.648 bis 2.
-
-//=========================== CHAT ========================================
-//@LINDA: detectPeaks(&detector) returnt "1" wenn ein Peak erkannt wurde,
-// sonst "0"
-// in Zeile 31 save ich das Ergebnis als Beispiel in die Variable "peak"
-// hinein und printe die dann über den Seriellen Monitor aus (Zeile 32).
-// Dann spuckt es jedes Mal eine 1 aus, wenn ein Peak erkannt wurde, sonst
-// die 0 (das war nur zum Testen)
-//--> Mit Veigl haben wir eine Funktion geschrieben, die bei jedem Peak die LEDs
-//    einmal aufleuchten lässt. Die Funktion heißt "activateLEDsOnce(1);"
-//    und wenn in der Klammer eine 1 steht, leuchten die LEDs einmal auf, bei einer 0 passiert
-// nichts. Wenn man jetzt activateLEDsOnce(detectPeaks(&detector));
-// schreibt, dann leuchten die LEDs immer dann auf, wenn ein Peak erkannt
-// wurde, weil dann ist detectPeaks(&detector) = 1 und activateLEDsOnce(1);
-// --> LEDs leuchten auf
-//@ANNA: Du bisch so cool
-//@LINDA: dine dialekt impression isch wieda on point ;) I han btw da
-// array mit da letschten 5 HR intervalle in da struct inegspeichert:
-// detector->hrInterval[hrIntervalIndex]
-// ^ dean bruchscht du wahrscheinlich, domit du adaptiera kannsch wia 
-// schnell sich LEDs fortbewegan, wenn die Intervalle kürzer werden
-// EDIT: I han da array jetzt auf 20 Intervalle erweitert
-//=========================================================================
