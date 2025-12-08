@@ -44,13 +44,12 @@ void loop() {
     getCurrentHRInterval(&detector);
     getCurrentHRIntervalAverage(&detector);
     //setSafeAngle(45); //use this to set servo to open position if you insert the servo into the flower
-    //handleFlower(&flower, &detector);
-    //handleBT(&flower, &detector);
+    handleFlower(&flower, &detector);
+    handleBT(&flower, &detector);
     //strip_pulse(&detector);
     strip_pulseMulti(&detector);
     //ledRingControl();
-    //functiontestLEDSTrip(); //use this to test if LED strip works
-    
+    //functiontestLEDSTrip(); //use this to test if LED strip works    
 }
 
 // NOTES ON DATA TYPES:

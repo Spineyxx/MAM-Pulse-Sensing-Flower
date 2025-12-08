@@ -110,7 +110,7 @@ void detectPeaks(PeakDetectorState *detector) {
 
     //============================================================================================================================================
     // Uncomment the line below to visualize signal, smoothed signal and trigger in Serial Plotter
-    plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
+    //plot(detector->signalBuffer[detector->bufferIndex], irSmooth, trigger);
     //============================================================================================================================================
 
     decideCalmness(detector); // decide calmness state based on HR intervals
@@ -164,8 +164,8 @@ void decideCalmness(PeakDetectorState *detector) {
                     } else {
                         detector->hrRatio = -1.0; //error value
                     }
-
-                if (hrIntervalAvgLastTen >= (110U * hrIntervalAvgTheTenBefore) / 100U){
+                    //if HR decreased by 10% + is below 90 bpm (666 ms interval) -> calm
+                if (hrIntervalAvgLastTen >= ((110U * hrIntervalAvgTheTenBefore) / 100U) && hrIntervalAvgLastTen > 666 && hrIntervalAvgTheTenBefore > 666){
                     detector->chillVariable = 'c';
                     detector->calmUntilMillis = millis() + CALM_HOLD_MS;
                 } else if ((int32_t)(detector->calmUntilMillis - (uint32_t)millis()) > 0 && detector->chillVariable == 'c') {
