@@ -225,8 +225,8 @@ void printoutCalmnessDebug(PeakDetectorState *detector) {
     Serial.print("\n");
 }
 
-int currentHR = 0;
-int currentHRAverage = 0;
+//int currentHR = 0;
+//int currentHRAverage = 0;
 
 // gets the current BPM
 void getCurrentHRInterval(PeakDetectorState *detector) {
@@ -244,11 +244,11 @@ void getCurrentHRInterval(PeakDetectorState *detector) {
     }
 
     // Convert Interval ms to BPM
-    currentHR = 60000 / interval;
+    detector->currentHR = 60000 / interval;
 
     // Print result
     Serial.print("Current HR: ");
-    Serial.print(currentHR);
+    Serial.print(detector->currentHR);
     Serial.println(" BPM");
 }
 
@@ -291,11 +291,11 @@ for (int i = 0; i < averageCount; i++) {
     }
 
     int avgInterval = sum / valid;
-    currentHRAverage = 60000 / avgInterval;
+    detector->currentHRAverage = 60000 / avgInterval;
 
     Serial.print("Current HR (avg ");
     Serial.print(valid);
     Serial.print("): ");
-    Serial.print(currentHR);
+    Serial.print(detector->currentHRAverage);
     Serial.println(" BPM");
 }

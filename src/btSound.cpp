@@ -35,7 +35,7 @@
 
 //================================================================================================
 // INSERT THE NAME OF YOUR BLUETOOTH SPEAKER/HEADPHONES HERE
-const char* soundboxSSID = "SoundCore mini"; //e.g. "SoundCore mini" is for Anker Soundcore Mini
+const char* soundboxSSID = "NSVE S8 PRO"; //e.g. "SoundCore mini" is for Anker Soundcore Mini
 // If you are unsure about the name, uncomment the Serial prints in the isValid() function
 //================================================================================================
 

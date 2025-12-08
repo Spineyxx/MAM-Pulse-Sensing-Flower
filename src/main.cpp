@@ -20,7 +20,9 @@ PeakDetectorState detector = {.signalBuffer = {0},
                               .peakDetected = 0,
                               .chillVariable = 'u',
                               .hrRatio = 0.0,
-                              .calmUntilMillis = 0};
+                              .calmUntilMillis = 0,
+                              .currentHR = 0,
+                              .currentHRAverage = 0};
 
 FlowerState flower = {.currentAngle = FLOWER_CLOSED_ANGLE,
                     .servoCounter = 0,

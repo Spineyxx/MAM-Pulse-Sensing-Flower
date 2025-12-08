@@ -16,6 +16,8 @@ typedef struct {
     char chillVariable; //Variablenname von meiner Mitbewohnerin ;) -> 'c' for calm, 'u' for undefined
     float hrRatio; // ratio of last 10 HR intervals to the 10 before that
     uint32_t calmUntilMillis; // timestamp until which 'c' should be held
+    int currentHR;
+    int currentHRAverage;
 } PeakDetectorState;
 
 #endif

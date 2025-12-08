@@ -104,11 +104,11 @@ uint32_t getActColor() { // goes through fixed sequence of colors
 
 
 // Map current HR to a color from blue to green to yellow to orange to red
-uint32_t getHRColor(int currentHRAverage) { 
+uint32_t getHRColor(PeakDetectorState *detector) { 
   
   // Clamp currentHRAverage to range
-  if (currentHRAverage <= hrMin) currentHRAverage = hrMin;
-  if (currentHRAverage >= hrMax) currentHRAverage = hrMax;
+  if (detector->currentHRAverage <= hrMin) detector->currentHRAverage = hrMin;
+  if (detector->currentHRAverage >= hrMax) detector->currentHRAverage = hrMax;
 
   // Define colors in the gradient
   uint32_t colors[] = {
@@ -121,7 +121,7 @@ uint32_t getHRColor(int currentHRAverage) {
   int nColors = sizeof(colors) / sizeof(colors[0]);
 
   // Map currentHRAverage to position along the gradient
-  float fraction = float(currentHRAverage - hrMin) / float(hrMax - hrMin);
+  float fraction = float(detector->currentHRAverage - hrMin) / float(hrMax - hrMin);
   float pos = fraction * (nColors - 1);
   int idx1 = int(pos);
   int idx2 = min(idx1 + 1, nColors - 1);
@@ -152,7 +152,7 @@ void stripPulse(PeakDetectorState *detector) {
   int minStep = 3;   // very fast movement at high HR
   int maxStep = 20;  // slow movement at low HR
 
-  float hrFraction = float(currentHRAverage - hrMin) / float(hrMax - hrMin);
+  float hrFraction = float(detector->currentHRAverage - hrMin) / float(hrMax - hrMin);
   hrFraction = constrain(hrFraction, 0.0, 1.0);
 
   int stepTime = maxStep - hrFraction * (maxStep - minStep);
@@ -162,7 +162,7 @@ void stripPulse(PeakDetectorState *detector) {
     dimLeds(DIMFACTOR, active);
     if (active == 2){
       if (pos <= LED_COUNT) {
-        uint32_t color=getHRColor(currentHRAverage); // choose either getActColor() for sequence or getHRColor() for HR dependable color
+        uint32_t color = getHRColor(detector); // choose either getActColor() for sequence or getHRColor() for HR dependable color
         strip.setPixelColor(LED_COUNT-pos, color);
         pos++;
       }else{
@@ -186,7 +186,7 @@ void stripPulseMulti(PeakDetectorState *detector) {
             if (!sweeps[i].active) {
                 sweeps[i].active = true;
                 sweeps[i].pos = 0;
-                sweeps[i].color = getHRColor(currentHRAverage);
+                sweeps[i].color = getHRColor(detector);
                 break; // only start one new sweep per peak
             }
         }
@@ -200,7 +200,7 @@ void stripPulseMulti(PeakDetectorState *detector) {
     int minStep = 3; // very fast at high HR
     int maxStep = 20; // slow at low HR
 
-    float hrFraction = float(currentHRAverage - hrMin) / float(hrMax - hrMin);
+    float hrFraction = float(detector->currentHRAverage - hrMin) / float(hrMax - hrMin);
     hrFraction = constrain(hrFraction, 0.0, 1.0);
 
     int stepTime = maxStep - hrFraction * (maxStep - minStep);
@@ -213,7 +213,7 @@ void stripPulseMulti(PeakDetectorState *detector) {
         dimLeds(DIMFACTOR, keepGlow ? 1 : 0);
 
         // Compute HR color, needed later again
-        uint32_t hrColor = getHRColor(currentHRAverage);
+        uint32_t hrColor = getHRColor(detector);
 
         // update sweeps
         for (int i = 0; i < MAX_SWEEPS; i++) {

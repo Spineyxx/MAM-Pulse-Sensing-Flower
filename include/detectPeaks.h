@@ -22,8 +22,8 @@ void printoutCalmnessDebug(PeakDetectorState *detector);
 void getCurrentHRInterval(PeakDetectorState *detector);
 void getCurrentHRIntervalAverage(PeakDetectorState *detector);
 
-extern int currentHR;
-extern int currentHRAverage;
+//extern int currentHR;
+//extern int currentHRAverage;
 
 
 #endif
