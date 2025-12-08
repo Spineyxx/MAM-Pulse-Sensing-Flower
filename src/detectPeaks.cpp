@@ -224,3 +224,78 @@ void printoutCalmnessDebug(PeakDetectorState *detector) {
     Serial.print(detector->hrRatio, 3);
     Serial.print("\n");
 }
+
+int currentHR = 0;
+int currentHRAverage = 0;
+
+// gets the current BPM
+void getCurrentHRInterval(PeakDetectorState *detector) {
+    int hrIntervalSize = sizeof(detector->hrInterval) / sizeof(detector->hrInterval[0]); // Calculate the size of hrInterval
+    // Get most recent interval (hrIntervalIndex - 1)
+    int lastIndex = detector->hrIntervalIndex - 1;
+    if (lastIndex < 0) lastIndex = hrIntervalSize - 1;
+
+    int interval = detector->hrInterval[lastIndex];
+
+    // Safety check to avoid division by zero or noise
+    if (interval <= 0) {
+        Serial.println("Invalid");
+        return;
+    }
+
+    // Convert Interval ms to BPM
+    currentHR = 60000 / interval;
+
+    // Print result
+    Serial.print("Current HR: ");
+    Serial.print(currentHR);
+    Serial.println(" BPM");
+}
+
+
+// gets the average BPM
+void getCurrentHRIntervalAverage(PeakDetectorState *detector) {
+    long sum = 0; // sum of Intervals
+    int valid = 0; // how many intervals are accepted
+    int averageCount = 5; // how many intervals are checked
+    int hrIntervalSizeAVG = sizeof(detector->hrInterval) / sizeof(detector->hrInterval[0]); // Calculate the size of hrInterval
+    int lastValidInterval = -1;   // tracks the latest accepted interval
+
+for (int i = 0; i < averageCount; i++) {
+
+        int idx = detector->hrIntervalIndex - 1 - i; // -i to go back in history
+        if (idx < 0) idx += hrIntervalSizeAVG; // if below zero, wrap around again to the back
+
+        int intervalAVG = detector->hrInterval[idx];
+
+        if (intervalAVG <= 0)
+            continue;
+
+
+        if (lastValidInterval > 0) {
+            if (intervalAVG > lastValidInterval * 2.0f) {
+                // Missed beat (bigger than 200% of last interval) is rejected
+                continue;
+            }
+        }
+       
+        // Accept interval
+        sum += intervalAVG;
+        valid++;
+        lastValidInterval = intervalAVG;  // for next iteration
+    }
+
+    if (valid == 0) {
+        Serial.println("No valid HR intervals found.");
+        return;
+    }
+
+    int avgInterval = sum / valid;
+    currentHRAverage = 60000 / avgInterval;
+
+    Serial.print("Current HR (avg ");
+    Serial.print(valid);
+    Serial.print("): ");
+    Serial.print(currentHR);
+    Serial.println(" BPM");
+}

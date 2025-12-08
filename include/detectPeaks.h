@@ -16,5 +16,11 @@ void detectPeaks(PeakDetectorState *detector);
 void decideCalmness(PeakDetectorState *detector);
 void plot(uint16_t val1, u_int16_t val2, u_int16_t val3);
 void printoutCalmnessDebug(PeakDetectorState *detector);
+void getCurrentHRInterval(PeakDetectorState *detector);
+void getCurrentHRIntervalAverage(PeakDetectorState *detector);
+
+extern int currentHR;
+extern int currentHRAverage;
+
 
 #endif
