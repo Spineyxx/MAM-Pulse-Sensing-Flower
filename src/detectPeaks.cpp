@@ -247,9 +247,9 @@ void getCurrentHRInterval(PeakDetectorState *detector) {
     detector->currentHR = 60000 / interval;
 
     // Print result
-    Serial.print("Current HR: ");
-    Serial.print(detector->currentHR);
-    Serial.println(" BPM");
+    // Serial.print("Current HR: ");
+    // Serial.print(detector->currentHR);
+    // Serial.println(" BPM");
 }
 
 
@@ -293,9 +293,9 @@ for (int i = 0; i < averageCount; i++) {
     int avgInterval = sum / valid;
     detector->currentHRAverage = 60000 / avgInterval;
 
-    Serial.print("Current HR (avg ");
-    Serial.print(valid);
-    Serial.print("): ");
-    Serial.print(detector->currentHRAverage);
-    Serial.println(" BPM");
+    // Serial.print("Current HR (avg ");
+    // Serial.print(valid);
+    // Serial.print("): ");
+    // Serial.print(detector->currentHRAverage);
+    // Serial.println(" BPM");
 }
